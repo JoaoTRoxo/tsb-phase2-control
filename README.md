@@ -191,9 +191,10 @@ own watchdog on the commands. `test_pipeline` checks this on the running nodes.
 
 ## Tests
 
-`make test` runs 119 checks: unit tests for every algorithm, closed-loop tests against simple
+`make test` runs 104 checks: unit tests for every algorithm, closed-loop tests against simple
 plant models, a launch test of the real nodes with fake sensors, and the ROS linters
-(`cppcheck`, `cpplint`, `uncrustify`, `flake8`, `pep257`, `lint_cmake`, `xmllint`).
+(`cpplint`, `uncrustify`, `flake8`, `pep257`, `lint_cmake`, `xmllint`). The `cppcheck` linter
+reports 15 more as skipped, since ROS 2 Humble disables it for the version in Ubuntu 22.04.
 `make check` turns the claims in this README into assertions on the recorded runs. CI runs
 all of it on every push and pull request, including the Gazebo runs.
 
