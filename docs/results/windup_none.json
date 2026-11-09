@@ -1,0 +1,12 @@
+{
+  "samples": 2092,
+  "surge_settling_s": [
+    null,
+    null,
+    7.52
+  ],
+  "heading_settling_s": [],
+  "surge_saturated_fraction": 0.5138623326959847,
+  "heading_saturated_fraction": 0.0,
+  "peak_abs_integral_surge": 0.8092499725720427
+}

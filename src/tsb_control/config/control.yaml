@@ -1,0 +1,52 @@
+# Inner control pipeline. Gains are a sensible starting point for a TurtleBot3
+# Burger; each one can be changed live, e.g.
+#   ros2 param set /pid_node heading.kp 3.0
+
+sensor_processing_node:
+  ros__parameters:
+    rate: 50.0                # [Hz] publication rate of /state
+    surge_filter_tau: 0.05    # [s] low-pass on the odometry surge velocity
+    heading_filter_tau: 1.0   # [s] complementary filter crossover: gyro below, odometry above
+    sensor_timeout: 0.5       # [s] a quieter sensor marks the state invalid
+
+pid_node:
+  ros__parameters:
+    rate: 50.0                # [Hz]
+    state_timeout: 0.5        # [s] older state: command zero and reset the integrators
+    reference_timeout: 0.0    # [s] older reference: same; 0 holds the last reference forever
+    anti_windup: back_calculation   # none | clamp | back_calculation
+    tracking_gain: 0.0        # [1/s] K_t for back_calculation; 0 uses Ki / Kp per loop
+
+    surge:
+      kp: 1.0
+      ki: 0.5
+      kd: 0.0
+      feedforward: 1.0        # v_cmd = feedforward * v_d + PID(e); 1.0 suits a velocity-controlled plant
+      output_limit: 0.22      # [m/s] TurtleBot3 Burger top speed
+      derivative_filter_tau: 0.1
+
+    heading:
+      kp: 2.0                 # used when gain_schedule.enabled is false
+      ki: 0.05
+      kd: 0.1
+      output_limit: 2.75      # [rad/s] rim speed limit / half track
+      integral_zone: 0.35     # [rad] integrate only near the setpoint, so a large step
+                              # does not charge the integrator and leave a slow tail
+
+    # Heading gains against surge speed. Snappy when turning near standstill, softer
+    # at speed, where every correction takes wheel speed away from surge. On a boat
+    # the same table would follow the 1/u^2 growth of the control authority.
+    gain_schedule:
+      enabled: true
+      speeds:     [0.0,  0.10, 0.22]   # [m/s]
+      heading_kp: [3.0,  2.2,  1.5]
+      heading_ki: [0.05, 0.05, 0.05]
+      heading_kd: [0.1,  0.1,  0.1]
+
+allocation_node:
+  ros__parameters:
+    rate: 50.0                # [Hz]
+    wheel_radius: 0.033       # [m]
+    wheel_separation: 0.160   # [m]
+    max_wheel_speed: 6.67     # [rad/s] 0.22 m/s at the rim
+    command_timeout: 0.5      # [s] watchdog: no command for this long stops the wheels

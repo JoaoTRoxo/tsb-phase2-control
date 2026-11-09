@@ -1,0 +1,26 @@
+{
+  "samples": 5396,
+  "surge_settling_s": [
+    null,
+    0.32,
+    0.36,
+    null,
+    0.28,
+    0.38,
+    null,
+    0.24,
+    0.38
+  ],
+  "heading_settling_s": [
+    null,
+    null,
+    null
+  ],
+  "surge_saturated_fraction": 0.021312083024462566,
+  "heading_saturated_fraction": 0.005003706449221645,
+  "peak_abs_integral_surge": 0.008775250911672769,
+  "finished": true,
+  "cross_track_rms_m": 0.009132771383838409,
+  "cross_track_max_m": 0.04892274207475089,
+  "final_distance_to_goal_m": 0.05795854581938843
+}

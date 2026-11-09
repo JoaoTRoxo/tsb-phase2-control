@@ -1,0 +1,11 @@
+# Step responses for both loops. Each triple is [duration s, surge m/s, heading rad].
+# The last heading step goes from -150 to +150 degrees: the short way is 60 degrees
+# through +-180, so an unwrapped controller would visibly turn 300 degrees instead.
+reference_sequence:
+  ros__parameters:
+    steps: [2.0, 0.0,  0.0,
+            8.0, 0.15, 0.0,
+            8.0, 0.15, 1.5708,
+            8.0, 0.10, -2.618,
+            8.0, 0.10, 2.618,
+            3.0, 0.0,  2.618]

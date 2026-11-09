@@ -1,0 +1,13 @@
+# Line-of-sight guidance. Waypoints come from config/missions/*.yaml or /waypoints.
+
+path_following_node:
+  ros__parameters:
+    rate: 20.0                # [Hz]
+    cruise_speed: 0.15        # [m/s]
+    min_speed: 0.03           # [m/s] floor of the arrival slowdown, so the goal is always reached
+    arrival_gain: 0.5         # [1/s] speed = gain * remaining distance near the goal
+    turn_slowdown: 2.0        # speed is scaled by cos(heading error)^this
+    lookahead: 0.4            # [m] LOS lookahead distance
+    sigma: 0.0                # integral LOS gain; 0 is classic LOS (no drift on a TurtleBot)
+    acceptance_radius: 0.05   # [m]
+    start_from_current: true  # the robot's position becomes the start of the path
