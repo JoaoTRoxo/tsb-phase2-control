@@ -4,8 +4,13 @@ DEPS  ?= tsb-control-deps
 IMAGE ?= tsb-control
 MISSION ?= square
 
-# BuildKit needs the buildx plugin, which not every Docker install has.
-BUILD = DOCKER_BUILDKIT=0 docker build -f docker/Dockerfile
+# BuildKit when the buildx plugin is installed, the classic builder otherwise, since not
+# every Docker install has buildx. BUILD_FLAGS passes extra options: CI uses the host's
+# network, because inside the build's own network GitHub's runners could not resolve
+# archive.ubuntu.com.
+DOCKER_BUILDKIT ?= $(shell docker buildx version >/dev/null 2>&1 && echo 1 || echo 0)
+BUILD_FLAGS ?=
+BUILD = DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build $(BUILD_FLAGS) -f docker/Dockerfile
 RUN   = docker run --rm -e HOME=/tmp -v /etc/passwd:/etc/passwd:ro -u $$(id -u):$$(id -g) \
         -v "$(CURDIR):/ws" -w /ws $(DEPS) bash -c
 ROS   = source /opt/ros/humble/setup.bash
