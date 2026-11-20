@@ -8,8 +8,8 @@
 ///
 /// On the TurtleBot the plant accepts velocity commands, so tau_u is a surge
 /// command in m/s and tau_r a yaw-rate command in rad/s. The names follow Figure 1
-/// of the statement, where on the boat they would be a force and a moment. Only
-/// the gains and limits in the YAML file change between the two.
+/// of the statement, where on the boat they would be a force and a moment. On the
+/// boat the gains, limits and feedforward law would change: thrust must also cover drag.
 ///
 /// Advanced features: surge feedforward, heading gain scheduling against speed,
 /// selectable anti-windup with saturation feedback from the allocation stage, and

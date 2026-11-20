@@ -66,7 +66,8 @@ Figure 1 is drawn for the boat, where `/tau_u` is a force, `/tau_r` a moment, an
 last stage outputs motor currents. A TurtleBot takes velocity commands, so here `/tau_u`
 is a surge command in m/s, `/tau_r` a yaw-rate command in rad/s, and `/current_left` and
 `/current_right` are wheel-speed setpoints in rad/s. The structure and topic names stay
-the same, and moving to the boat means changing gains, limits and the allocation model.
+the same. Moving to the boat would mean changing gains, limits and the allocation model,
+and also the feedforward: a boat needs thrust to overcome drag, not just the target speed.
 
 ## Usage examples
 
@@ -139,15 +140,18 @@ the error, which avoids noise amplification and a kick when the setpoint steps.
 `Ki * sum(e * dt)` rather than the sum of the error. Changing `Ki` therefore cannot make the
 output jump, which is what makes gain scheduling and live retuning bumpless.
 
-### Advanced features, each measured in Gazebo
+### Advanced features
 
 | Feature | What it does | Result |
 | --- | --- | --- |
 | Feedforward | Commands `v_d` directly | Surge settles in 0.3 to 0.9 s, against 2.4 to 6.2 s without it |
 | Anti-windup | Stops the integrator growing during saturation | After an unreachable speed: recovers in 0.36 s, against over 10 s without it |
-| Gain scheduling | Heading gains as a function of speed | Heading settles in 1.6 to 1.9 s, against 1.9 to 2.2 s with fixed gains |
-| Saturation feedback | The allocation tells the PID when it cut a loop | The integrator holds during turns, with no surge tail afterwards |
-| Integral zone | Integrates heading only near the setpoint | Removes a 2 degree tail after large heading steps |
+| Gain scheduling | Heading gains as a function of speed | Heading settles in 1.6 to 1.9 s, against 1.9 to 2.2 s with fixed gains (single runs, so a small difference) |
+| Saturation feedback | The allocation tells the PID when it cut a loop | Unit tested; no Gazebo comparison run |
+| Integral zone | Integrates heading only near the setpoint | Unit tested; a simple model puts the tail it removes at about 1 degree |
+
+Feedforward, anti-windup and gain scheduling were each compared in Gazebo with the feature
+on and off. Each figure comes from one run.
 
 Without anti-windup the integrator reaches 0.81 m/s. The robot then stays at full speed for
 the entire 10 s phase in which it should be doing 0.10 m/s:
@@ -181,7 +185,8 @@ default because a TurtleBot has none.
 | Zigzag | 1.3 cm | 4.7 cm | 5.7 cm |
 
 Cross-track figures cover the straight parts, more than 0.5 m before each waypoint, since
-corners are transients by design. The stopping distance is set by the 5 cm acceptance radius.
+corners are transients by design. The robot reaches the 5 cm acceptance radius and brakes,
+then drifts back slightly as a small surge integral term decays, ending about 6 cm away.
 
 ### Safety
 
@@ -191,12 +196,13 @@ own watchdog on the commands. `test_pipeline` checks this on the running nodes.
 
 ## Tests
 
-`make test` runs 104 checks: unit tests for every algorithm, closed-loop tests against simple
+`make test` runs 91 test cases: unit tests for every algorithm, closed-loop tests against simple
 plant models, a launch test of the real nodes with fake sensors, and the ROS linters
 (`cpplint`, `uncrustify`, `flake8`, `pep257`, `lint_cmake`, `xmllint`). The `cppcheck` linter
 reports 15 more as skipped, since ROS 2 Humble disables it for the version in Ubuntu 22.04.
-`make check` turns the claims in this README into assertions on the recorded runs. CI runs
-all of it on every push and pull request, including the Gazebo runs.
+`make check` asserts the path-following and anti-windup results on the recorded runs, with
+some margin. CI runs the tests on every push and pull request, plus four of the eight Gazebo
+runs: the square mission, the step responses, and anti-windup on and off.
 
 ## Problems found while integrating
 

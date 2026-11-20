@@ -35,7 +35,7 @@ pid_node:
 
     # Heading gains against surge speed. Snappy when turning near standstill, softer
     # at speed, where every correction takes wheel speed away from surge. On a boat
-    # the same table would follow the 1/u^2 growth of the control authority.
+    # steered by a rudder the table would follow the 1/u^2 growth of its authority.
     gain_schedule:
       enabled: true
       speeds:     [0.0,  0.10, 0.22]   # [m/s]
